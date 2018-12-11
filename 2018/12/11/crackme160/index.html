@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=Edge"><meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"><meta name="format-detection" content="telephone=no"><meta name="format-detection" content="email=no"><meta name="description"><meta name="keywords" content="Hexo, Gruntjs, Nodejs, Reactjs, Vuejs"><title> crackme160-  - 万事屋</title><link rel="stylesheet" href="/css/main_style.min.css"><link rel="icon" href="/favicon.ico"></head><body><input id="navi" type="checkbox"><ul class="main-navication"><li><a href="/"><span>Home</span></a></li><li><a href="https://norw1nd.github.io/"><span>Norw1nd‘blog</span></a></li><li><a href="https://no4l.github.io/"><span>no4l’blog</span></a></li></ul><div class="wrapper" id="wrap"><div class="post-header"><label class="navi-button light" for="navi">MENU</label><img class="background" src="http://callfiles.ueibo.com/hexo-theme-laughing/post_background.jpg"><div class="post-title"><h1 class="title"> crackme160- </h1><ul class="meta"><li><i class="icon icon-author"></i>会飞的鱼</li><li><i class="icon icon-clock"></i>1 Minutes</li><li><i class="icon icon-calendar"></i>December 11, 2018</li></ul></div></div><div class="article-content" style="max-width:800px"><h3 id="18-Brad-Soblesky-1"><a href="#18-Brad-Soblesky-1" class="headerlink" title="-18 Brad Soblesky.1"></a>-18 Brad Soblesky.1</h3><p>有信息框，用peid查看</p>
+<p><img src="/2018/12/11/crackme160/2018-12-11 22_54_05-启动.png" alt=""></p>
+<p>搜索字符串</p>
+<p><img src="/2018/12/11/crackme160/2018-12-11 23_02_32-启动.png" alt=""></p>
+<p>跟随</p>
+<p>发现关键跳转，nop掉就行</p>
+<p><img src="/2018/12/11/crackme160/2018-12-11 23_03_13-启动.png" alt=""></p>
+<p>注册机</p>
+<p>猜测注册码是固定的，为什么这样猜实不相瞒是直觉。。、</p>
+<p>从关键跳转往上找，找到字符串比较的子程序</p>
+<p><img src="/2018/12/11/crackme160/2018-12-11 23_09_41-启动.png" alt=""></p>
+<p>在次下断，F9，输入字符串，断在在这，F7进入子程序</p>
+<p><img src="/2018/12/11/crackme160/2018-12-11 23_12_59-启动.png" alt=""></p>
+<p>典型的函数调用，查看堆栈</p>
+<p><img src="/2018/12/11/crackme160/E:/blog\hexo\source\_posts\crackme160\2018-12-11 23_14_04-启动.png" alt=""></p>
+<p>根据栈的结构，可知是两个字符串比较，那么注册码应该是”<brd-sob>“</brd-sob></p>
+<p>ok。。决定考完四级就好好xio习MFC</p>
+</div><div class="article-meta" style="max-width:800px"></div><div class="article-comment" style="max-width:800px"><div class="ds-thread" id="ds-thread" data-thread-key="cjpjw3rxc0004m4u238hxm8dm" data-title=" crackme160- " data-url="http://yoursite.com/2018/12/11/crackme160/" site-name="ueibo"></div><script>var siteName = document.getElementById('ds-thread').getAttribute('site-name');
+var duoshuoQuery = {short_name: siteName};
+(function() {
+  var ds = document.createElement('script');
+  ds.type = 'text/javascript';ds.async = true;
+  ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+  ds.charset = 'UTF-8';
+  (document.getElementsByTagName('head')[0] 
+  || document.getElementsByTagName('body')[0]).appendChild(ds);
+})();</script></div><ul class="navication"><li class="home"><a href="/"><i class="icon icon-home"></i></a></li><li><a href="/2018/12/09/House-Of-Spirit-2014-hack-lu-oreo/"><i class="icon icon-arror-right"></i></a></li></ul><div class="page-footer"><div class="top"><ul class="social"><li><a href="https://github.com/BoizZ" title="Github" target="_blank"><i class="icon icon-github"></i></a></li><li><a title="Weibo" target="_blank"><i class="icon icon-weibo"></i></a></li><li><a title="SegmentFault" target="_blank"><i class="icon icon-segmentfault"></i></a></li></ul></div><div class="bottom"><p class="copyright">© 2018 万事屋<br><small>POWER BY <a href="https://hexo.io" target="_blank">HEXO</a></small><small>, THEME BY <a href="https://github.com/BoizZ/hexo-theme-laughing" target="_blank">LAUGHING</a></small></p></div></div></div><script>var wrap = document.getElementById('wrap');
+window.onload = function () {
+  wrap.className += ' done';
+}</script></body></html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=Edge"><meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"><meta name="format-detection" content="telephone=no"><meta name="format-detection" content="email=no"><meta name="description"><meta name="keywords" content="Hexo, Gruntjs, Nodejs, Reactjs, Vuejs"><title>破解之VisualSite Designer  - NO</title><link rel="stylesheet" href="/css/main_style.min.css"><link rel="icon" href="/favicon.ico"></head><body><input id="navi" type="checkbox"><ul class="main-navication"><li><a href="/"><span>Home</span></a></li><li><a href="https://norw1nd.github.io/"><span>Norw1nd‘blog</span></a></li><li><a href="https://no4l.github.io/"><span>no4l’blog</span></a></li></ul><div class="wrapper" id="wrap"><div class="post-header"><label class="navi-button light" for="navi">MENU</label><img class="background" src="http://callfiles.ueibo.com/hexo-theme-laughing/post_background.jpg"><div class="post-title"><h1 class="title">破解之VisualSite Designer </h1><ul class="meta"><li><i class="icon icon-author"></i>会飞的鱼</li><li><i class="icon icon-clock"></i>2 Minutes</li><li><i class="icon icon-calendar"></i>April 21, 2019</li></ul></div></div><div class="article-content" style="max-width:800px"><p>学习了小甲鱼OD使用教程之后的记录</p>
+<p>一，程序分析、</p>
+<p>打开</p>
+<p><img src="/2019/04/21/破解之VisualSite-Designer/2019-04-21 16_09_29-启动.png" alt=""></p>
+<p>关闭</p>
+<p><img src="/2019/04/21/破解之VisualSite-Designer/2019-04-21 16_10_49-启动.png" alt=""></p>
+<p>这个程序无壳，需要破解的有两个点：1.使用次数限制 2.广告</p>
+<p>第一点甲鱼叔在视频中介绍了两种方法，在次数耗尽之前和之后</p>
+<p>1.次数耗尽之前</p>
+<p>用OD载入程序</p>
+<p><img src="/2019/04/21/破解之VisualSite-Designer/E:/blog\hexo\source\_posts\破解之VisualSite-Designer\2019-04-21 16_12_19-启动.png" alt=""></p>
+<p>具体方法就是一路F8，遇到弹窗就在此处F2下断，然后重新载入，F9运行到断点处，消除断点，继续执行</p>
+<p>当然这是在程序领空的操作，当我们发现基地址变成非常大数字的时候，就是来到了动态链接库领空，如下图</p>
+<p><img src="/2019/04/21/破解之VisualSite-Designer/2019-04-21 16_18_26-启动.png" alt=""></p>
+<p>此时要下硬件断点，具体方法是选中该地址，右键–断点–硬件执行，如果要查看断点 工具栏调试–硬件断点，然后依然重新载入，F9运行到断点处。删除断点，继续向下</p>
+<p>当调试到一个尴尬的局面，进入一个函数之后，弹窗已经出来了，但是程序仍然可以单步执行，那么我们离成功就不远了</p>
+<p>我们重新在这个函数上下断，运行到此处</p>
+<p><img src="/2019/04/21/破解之VisualSite-Designer/2019-04-21 16_25_49-启动.png" alt=""></p>
+<p>发现该函数在DLL领空，以我的技术现在改不了动态链接库。。，所以继续返回上一层函数</p>
+<p><img src="/2019/04/21/破解之VisualSite-Designer/2019-04-21 16_24_41-启动.png" alt=""></p>
+<p>在此处下断</p>
+<p><img src="/2019/04/21/破解之VisualSite-Designer/2019-04-21 16_37_26-启动.png" alt=""></p>
+<p>F8，出现弹窗，计数减一完成，点击进入程序发现程序执行下一条语句</p>
+<p><img src="/2019/04/21/破解之VisualSite-Designer/E:/blog\hexo\source\_posts\破解之VisualSite-Designer\2019-04-21 16_38_36-启动.png" alt=""></p>
+<p>所以该函数的作用是显示欢迎界面，计数器减一并返回eax==1，</p>
+<p>此时我们修改该指令</p>
+<p><img src="/2019/04/21/破解之VisualSite-Designer/E:/blog\hexo\source\_posts\破解之VisualSite-Designer\2019-04-21 16_43_21-启动.png" alt=""></p>
+<p>保存修改，运行，发现已经没有次数限制</p>
+<p>2.次数耗尽之后</p>
+<p><img src="/2019/04/21/破解之VisualSite-Designer/E:/blog\hexo\source\_posts\破解之VisualSite-Designer\2019-04-21 16_45_52-启动.png" alt=""></p>
+<p>在耗尽之前，我们用OD载入观察所有的条件跳转语句，并标志出跳转结果，等到次数耗尽之后观察跳转结果与是否发生改变，找到关键跳转点nop掉就ok了，这里不再赘述</p>
+<p>3.去广告</p>
+<p>这里用到了查看调用堆栈的方法</p>
+<p>我们知道在调用函数的时候会有一系列参数的入栈保护，此时就会调用堆栈，alt+k可以查看调用情况</p>
+<p>删除所有断点，重新运行程序，弹出广告后暂停，查看堆栈调用情况</p>
+<p><img src="/2019/04/21/破解之VisualSite-Designer/2019-04-21 17_00_18-启动.png" alt=""></p>
+<p>从后往前找到程序领空的调用</p>
+<p>这里是0x00480c24，双击来到这里，下断点重新执行</p>
+<p>发现断在0x00480c24时没有弹出广告，F8之后广告出现，所以0x00480c24处函数便是关键函数，nop掉</p>
+<p>完成</p>
+</div><div class="article-meta" style="max-width:800px"></div><div class="article-comment" style="max-width:800px"><div class="ds-thread" id="ds-thread" data-thread-key="cjuqpuzxw000ngcu253xemjj0" data-title="破解之VisualSite Designer " data-url="http://yoursite.com/2019/04/21/破解之VisualSite-Designer/" site-name="ueibo"></div><script>var siteName = document.getElementById('ds-thread').getAttribute('site-name');
+var duoshuoQuery = {short_name: siteName};
+(function() {
+  var ds = document.createElement('script');
+  ds.type = 'text/javascript';ds.async = true;
+  ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+  ds.charset = 'UTF-8';
+  (document.getElementsByTagName('head')[0] 
+  || document.getElementsByTagName('body')[0]).appendChild(ds);
+})();</script></div><ul class="navication"><li class="home"><a href="/"><i class="icon icon-home"></i></a></li><li><a href="/2019/04/19/2019西湖论剑预选赛story/"><i class="icon icon-arror-right"></i></a></li></ul><div class="page-footer"><div class="top"><ul class="social"><li><a href="https://github.com/BoizZ" title="Github" target="_blank"><i class="icon icon-github"></i></a></li><li><a title="Weibo" target="_blank"><i class="icon icon-weibo"></i></a></li><li><a title="SegmentFault" target="_blank"><i class="icon icon-segmentfault"></i></a></li></ul></div><div class="bottom"><p class="copyright">© 2019 NO<br><small>POWER BY <a href="https://hexo.io" target="_blank">HEXO</a></small><small>, THEME BY <a href="https://github.com/BoizZ/hexo-theme-laughing" target="_blank">LAUGHING</a></small></p></div></div></div><script>var wrap = document.getElementById('wrap');
+window.onload = function () {
+  wrap.className += ' done';
+}</script></body></html>

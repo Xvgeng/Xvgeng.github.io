@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=Edge"><meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"><meta name="format-detection" content="telephone=no"><meta name="format-detection" content="email=no"><meta name="description"><meta name="keywords" content="Hexo, Gruntjs, Nodejs, Reactjs, Vuejs"><title>2019西湖论剑预选赛story - NO</title><link rel="stylesheet" href="/css/main_style.min.css"><link rel="icon" href="/favicon.ico"></head><body><input id="navi" type="checkbox"><ul class="main-navication"><li><a href="/"><span>Home</span></a></li><li><a href="https://norw1nd.github.io/"><span>Norw1nd‘blog</span></a></li><li><a href="https://no4l.github.io/"><span>no4l’blog</span></a></li></ul><div class="wrapper" id="wrap"><div class="post-header"><label class="navi-button light" for="navi">MENU</label><img class="background" src="http://callfiles.ueibo.com/hexo-theme-laughing/post_background.jpg"><div class="post-title"><h1 class="title">2019西湖论剑预选赛story</h1><ul class="meta"><li><i class="icon icon-author"></i>会飞的鱼</li><li><i class="icon icon-clock"></i>1 Minutes</li><li><i class="icon icon-calendar"></i>April 19, 2019</li></ul></div></div><div class="article-content" style="max-width:800px"><p>1.程序分析</p>
+<p>一.程序分析</p>
+<p>开始以为是堆溢出，其实是栈溢出+格式化字符串漏洞</p>
+<p>查看保护机制</p>
+<p><img src="/2019/04/19/2019西湖论剑预选赛story/2019-04-19 09_24_33-启动.png" alt=""></p>
+<p>开了canary，所以我们要绕过canary</p>
+<p>1.格式化字符串漏洞</p>
+<p><img src="/2019/04/19/2019西湖论剑预选赛story/2019-04-19 09_21_32-启动.png" alt=""></p>
+<p>2.溢出点</p>
+<p><img src="/2019/04/19/2019西湖论剑预选赛story/2019-04-19 09_23_45-启动.png" alt=""></p>
+<p>所以我们的解题思路为：‘</p>
+<p>1.利用格式化字符串漏洞泄露Canary</p>
+<p>2.利用格式化字符串漏洞构造ROPchain泄露libc基地址，求出system地址</p>
+<p>3.利用Onegadget得到’/bin/sh’地址，getchell</p>
+<p>二. 漏洞利用</p>
+<p>1.泄露Canary</p>
+<p><img src="/2019/04/19/2019西湖论剑预选赛story/Inked2019-04-19 09_31_59-启动_LI.jpg" alt=""></p>
+<p>关于Canary的原理这里不再赘述，这里得到Canary在ebp-8处，接下来找到canary距离格式化字符串的偏移</p>
+<p>我们在0x400915处下断点，运行</p>
+<p><img src="/2019/04/19/2019西湖论剑预选赛story/2019-04-19 09_38_09-启动.png" alt=""></p>
+<p>之后单步运行到这里</p>
+<p><img src="/2019/04/19/2019西湖论剑预选赛story/2019-04-19 09_39_05-启动.png" alt=""></p>
+<p>查看rax的值，此时就是Canary</p>
+<p><img src="/2019/04/19/2019西湖论剑预选赛story/2019-04-19 10_09_09-启动.png" alt=""></p>
+<p>我们的目的是得到Canary距fmt的偏移，继续向下跟踪</p>
+<p><img src="/2019/04/19/2019西湖论剑预选赛story/E:/blog\hexo\source\_posts\2019西湖论剑预选赛story\2019-04-19 09_44_14-启动.png" alt=""></p>
+<p><img src="/2019/04/19/2019西湖论剑预选赛story/E:/blog\hexo\source\_posts\2019西湖论剑预选赛story\2019-04-19 10_08_06-启动.png" alt=""></p>
+<p>可以得到Canary偏移为15</p>
+<p>2.onegadget</p>
+<p>好用<a href="https://github.com/david942j/one_gadget" target="_blank" rel="noopener">https://github.com/david942j/one_gadget</a></p>
+<p><img src="/2019/04/19/2019西湖论剑预选赛story/2019-04-19 10_32_49-启动.png" alt=""></p>
+<p>exp:</p>
+</div><div class="article-meta" style="max-width:800px"></div><div class="article-comment" style="max-width:800px"><div class="ds-thread" id="ds-thread" data-thread-key="cjuqpuzmz0000gcu2aoh2hjpn" data-title="2019西湖论剑预选赛story" data-url="http://yoursite.com/2019/04/19/2019西湖论剑预选赛story/" site-name="ueibo"></div><script>var siteName = document.getElementById('ds-thread').getAttribute('site-name');
+var duoshuoQuery = {short_name: siteName};
+(function() {
+  var ds = document.createElement('script');
+  ds.type = 'text/javascript';ds.async = true;
+  ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+  ds.charset = 'UTF-8';
+  (document.getElementsByTagName('head')[0] 
+  || document.getElementsByTagName('body')[0]).appendChild(ds);
+})();</script></div><ul class="navication"><li class="home"><a href="/"><i class="icon icon-home"></i></a></li><li><a href="/2019/04/21/破解之VisualSite-Designer/"><i class="icon icon-arror-left"></i></a></li><li><a href="/2019/03/29/bugku/"><i class="icon icon-arror-right"></i></a></li></ul><div class="page-footer"><div class="top"><ul class="social"><li><a href="https://github.com/BoizZ" title="Github" target="_blank"><i class="icon icon-github"></i></a></li><li><a title="Weibo" target="_blank"><i class="icon icon-weibo"></i></a></li><li><a title="SegmentFault" target="_blank"><i class="icon icon-segmentfault"></i></a></li></ul></div><div class="bottom"><p class="copyright">© 2019 NO<br><small>POWER BY <a href="https://hexo.io" target="_blank">HEXO</a></small><small>, THEME BY <a href="https://github.com/BoizZ/hexo-theme-laughing" target="_blank">LAUGHING</a></small></p></div></div></div><script>var wrap = document.getElementById('wrap');
+window.onload = function () {
+  wrap.className += ' done';
+}</script></body></html>

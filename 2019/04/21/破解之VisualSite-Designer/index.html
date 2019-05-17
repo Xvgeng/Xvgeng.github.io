@@ -38,7 +38,20 @@
 <p>这里是0x00480c24，双击来到这里，下断点重新执行</p>
 <p>发现断在0x00480c24时没有弹出广告，F8之后广告出现，所以0x00480c24处函数便是关键函数，nop掉</p>
 <p>完成</p>
-</div><div class="article-meta" style="max-width:800px"></div><div class="article-comment" style="max-width:800px"><div class="ds-thread" id="ds-thread" data-thread-key="cjuqpuzxw000ngcu253xemjj0" data-title="破解之VisualSite Designer " data-url="http://yoursite.com/2019/04/21/破解之VisualSite-Designer/" site-name="ueibo"></div><script>var siteName = document.getElementById('ds-thread').getAttribute('site-name');
+<p>总结：</p>
+<p>1.断点有：软件断点，硬件断点，内存断点</p>
+<p>软件断点：原理是在断点处重写代码，插入一个int3中断指令，当cpu执行到int3时od便可获得执行权</p>
+<p>硬件断点：可行性依赖于cpu的物理支持</p>
+<p>2.其中有8个专用的调试寄存器：Dr0-Dr7</p>
+<p>Dr0-Dr3：存放执行地址</p>
+<p>Dr4-Dr5：默认不使用</p>
+<p>Dr6-Dr7：记录Dr0-Dr3的特征</p>
+<p>所以这也是硬件断点最多下四个的原因</p>
+<p>3.硬件断点和软件断点的区别</p>
+<p>软件断点：只能下载od的cpu界面，不能下载数据端，在DLL中重启即消失，以指令为单位，</p>
+<p>硬件断点：下在动态链接库中</p>
+<p>4.alt+F9：从DLL领空回到程序领空并暂停</p>
+</div><div class="article-meta" style="max-width:800px"></div><div class="article-comment" style="max-width:800px"><div class="ds-thread" id="ds-thread" data-thread-key="cjvrf8ixf000ovwu2ynruj5vv" data-title="破解之VisualSite Designer " data-url="http://yoursite.com/2019/04/21/破解之VisualSite-Designer/" site-name="ueibo"></div><script>var siteName = document.getElementById('ds-thread').getAttribute('site-name');
 var duoshuoQuery = {short_name: siteName};
 (function() {
   var ds = document.createElement('script');
@@ -47,7 +60,7 @@ var duoshuoQuery = {short_name: siteName};
   ds.charset = 'UTF-8';
   (document.getElementsByTagName('head')[0] 
   || document.getElementsByTagName('body')[0]).appendChild(ds);
-})();</script></div><ul class="navication"><li class="home"><a href="/"><i class="icon icon-home"></i></a></li><li><a href="/2019/04/19/2019西湖论剑预选赛story/"><i class="icon icon-arror-right"></i></a></li></ul><div class="page-footer"><div class="top"><ul class="social"><li><a href="https://github.com/BoizZ" title="Github" target="_blank"><i class="icon icon-github"></i></a></li><li><a title="Weibo" target="_blank"><i class="icon icon-weibo"></i></a></li><li><a title="SegmentFault" target="_blank"><i class="icon icon-segmentfault"></i></a></li></ul></div><div class="bottom"><p class="copyright">© 2019 NO<br><small>POWER BY <a href="https://hexo.io" target="_blank">HEXO</a></small><small>, THEME BY <a href="https://github.com/BoizZ/hexo-theme-laughing" target="_blank">LAUGHING</a></small></p></div></div></div><script>var wrap = document.getElementById('wrap');
+})();</script></div><ul class="navication"><li class="home"><a href="/"><i class="icon icon-home"></i></a></li><li><a href="/2019/05/11/SROP-smallest/"><i class="icon icon-arror-left"></i></a></li><li><a href="/2019/04/19/2019西湖论剑预选赛story/"><i class="icon icon-arror-right"></i></a></li></ul><div class="page-footer"><div class="top"><ul class="social"><li><a href="https://github.com/BoizZ" title="Github" target="_blank"><i class="icon icon-github"></i></a></li><li><a title="Weibo" target="_blank"><i class="icon icon-weibo"></i></a></li><li><a title="SegmentFault" target="_blank"><i class="icon icon-segmentfault"></i></a></li></ul></div><div class="bottom"><p class="copyright">© 2019 NO<br><small>POWER BY <a href="https://hexo.io" target="_blank">HEXO</a></small><small>, THEME BY <a href="https://github.com/BoizZ/hexo-theme-laughing" target="_blank">LAUGHING</a></small></p></div></div></div><script>var wrap = document.getElementById('wrap');
 window.onload = function () {
   wrap.className += ' done';
 }</script></body></html>

@@ -1233,7 +1233,7 @@ pre code {
     vertical-align: middle;
   }
   .links-of-author a::before {
-    background: #0604ff;
+    background: #34ab7c;
     display: inline-block;
     margin-right: 3px;
     transform: translateY(-2px);
@@ -1243,6 +1243,7 @@ pre code {
     width: 4px;
   }
   .links-of-blogroll-item {
+    display: inline-block;
     padding: 2px 10px;
   }
   .links-of-blogroll-item a {
@@ -2559,6 +2560,20 @@ header.header {
   }
   .links-of-author-item a:hover {
     background: var(--body-bg-color);
+  }
+  .links-of-blogroll-item {
+    display: inline-block;
+    max-width: 100%;
+    margin: 5px 0 0;
+  }
+  .links-of-blogroll-item a {
+    box-sizing: border-box;
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 0 5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .back-to-top {
     background: var(--body-bg-color);

@@ -189,7 +189,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2024-09-02 20:11:52 / 修改时间：22:15:44" itemprop="dateCreated datePublished" datetime="2024-09-02T20:11:52+08:00">2024-09-02</time>
+      <time title="创建时间：2024-09-02 20:11:52 / 修改时间：22:27:36" itemprop="dateCreated datePublished" datetime="2024-09-02T20:11:52+08:00">2024-09-02</time>
     </span>
 
   
@@ -202,23 +202,18 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><pre><code>   在学习二进制时，GDB是必不可少的工具。我经常使用GDB来动态调试一个ELF文件，但是却不能准确、完整地说出GDB调试的原理，所以在这里总结一下。
-   GDB能attach 到一个正在运行的进程中，以实时获取进程中的内存数据、增加断点、查看当前运行状态下函数变量值、修改寄存器的值。其基本的调试功能是通过系统调用ptrace实现的。GDB有本地调试和远程调试两种模式：
-</code></pre>
+          <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>在学习二进制时，GDB是必不可少的工具。我经常使用GDB来动态调试一个ELF文件，但是却不能准确、完整地说出GDB调试的原理，所以在这里总结一下。<br>GDB能attach 到一个正在运行的进程中，以实时获取进程中的内存数据、增加断点、查看当前运行状态下函数变量值、修改寄存器的值。其基本的调试功能是通过系统调用ptrace实现的。GDB有本地调试和远程调试两种模式：</p>
 <ul>
 <li>本地调试：GDB与目标程序在同一台电脑中</li>
 <li>远程调试：GDB与目标程序不在同一台电脑，此时需要GdbServer，GdbServer与目标程序在同一个设备中，GDB可以通过串口或者RSP协议（GDB Remote Serial Protocol协议）通信</li>
 </ul>
-<h3 id="gdb工作流程"><a href="#gdb工作流程" class="headerlink" title="gdb工作流程"></a>gdb工作流程</h3><h4 id="直接调试目标程序"><a href="#直接调试目标程序" class="headerlink" title="直接调试目标程序"></a>直接调试目标程序</h4><pre><code> 当在终端输入命令`gdb ./test`时，此时gdb启动并从头开始调试test，gdb工作流程如下：
-</code></pre>
+<h3 id="gdb工作流程"><a href="#gdb工作流程" class="headerlink" title="gdb工作流程"></a>gdb工作流程</h3><h4 id="直接调试目标程序"><a href="#直接调试目标程序" class="headerlink" title="直接调试目标程序"></a>直接调试目标程序</h4><p>当在终端输入命令<code>gdb ./test</code>时，此时gdb启动并从头开始调试test，gdb工作流程如下：</p>
 <ol>
 <li>操作系统启动gdb进程，gdb进程fork出一个子进程</li>
 <li>子进程调用系统函数ptrace（PTRACE_TRACEME , …）</li>
-<li>子进程调用execve加载，执行目标程序test</li>
+<li>子进程调用execve加载，执行目标程序test<br>示例如下：<br>   首先使用<code>gdb ./pwn</code>，建立追踪关系，接着使用<code>pstree -p | grep  &#39;pwn&#39;</code>,可以看到pwn程序的父进程为gdb。<br><img src="/images/GDB_Debug/gdb_pwn.jpg" alt="gdb_pwn.jpg"></li>
 </ol>
-<p>示例如下：<br>      首先使用<code>gdb ./pwn</code>，建立追踪关系，接着使用<code>pstree -p | grep  &#39;pwn&#39;</code>,可以看到pwn程序的父进程为gdb。<br><img src="/images/GDB_Debug/gdb_pwn.jpg" alt="gdb_pwn.jpg"></p>
-<h4 id="使用attach调试已运行程序"><a href="#使用attach调试已运行程序" class="headerlink" title="使用attach调试已运行程序"></a>使用attach调试已运行程序</h4><pre><code>  当在终端输入命令`gdb attach -p $pid`时，gdb调试一个已经在运行中的程序，此时gdb的工作流程为：
-</code></pre>
+<h4 id="使用attach调试已运行程序"><a href="#使用attach调试已运行程序" class="headerlink" title="使用attach调试已运行程序"></a>使用attach调试已运行程序</h4><p>当在终端输入命令<code>gdb attach -p $pid</code>时，gdb调试一个已经在运行中的程序，此时gdb的工作流程为：</p>
 <ol>
 <li>gdb成为test进程的父进程</li>
 <li>test进程进入TASK_TRACED，表示当前进程正在被追踪，此时test进程会停下来，等待gdb的命令，在TASK_TRACED状态下的进程只接受ptace指定的PTRACE_DETACH和PTRACE_CONT请求，从而唤醒进程执行操作</li>
@@ -233,11 +228,9 @@
 <li>查看pwn对应的父进程<code>ps -ef | grep 6161</code>，可以看到gdb为pwn进程的父进程</li>
 </ul>
 <p><img src="/images/GDB_Debug/pwn_pid.jpg" alt="pwn_pid.jpg"><br><img src="/images/GDB_Debug/attach_pid.jpg" alt="attach_pid.jpg"><br><img src="/images/GDB_Debug/pid.jpg" alt="pid.jpg"></p>
-<h3 id="ptrace"><a href="#ptrace" class="headerlink" title="ptrace"></a>ptrace</h3><pre><code>  ptrace是Linux内核提供的一个用于进程追踪的系统调用函数，其接口声明如下，通过ptrace，gdb可以读写目标进程test的指令空间、数据空间、堆栈和寄存器的值，并且gdb进程接管了test进程所有信号，操作系统发送给目标进程的信号都会被gdb截获。
-</code></pre>
+<h3 id="ptrace"><a href="#ptrace" class="headerlink" title="ptrace"></a>ptrace</h3><p>ptrace是Linux内核提供的一个用于进程追踪的系统调用函数，其接口声明如下，通过ptrace，gdb可以读写目标进程test的指令空间、数据空间、堆栈和寄存器的值，并且gdb进程接管了test进程所有信号，操作系统发送给目标进程的信号都会被gdb截获。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#include &lt;sys/ptrace.h&gt;</span></span><br><span class="line">long ptrace(enum __ptrace_request request, pid_t pid,</span><br><span class="line">            void *addr, void *data);</span><br></pre></td></tr></table></figure>
-<pre><code>   ptrace的参数非常重要，这里参考[大佬博客](https://blog.csdn.net/Z_Stand/article/details/108395906)：
-</code></pre>
+<p>ptrace的参数非常重要，这里参考<a target="_blank" rel="noopener" href="https://blog.csdn.net/Z_Stand/article/details/108395906">大佬博客</a>：</p>
 <table>
 <thead>
 <tr>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.2.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"xvgeng.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="HSM简介HSM是一个专用的硬件安全处理器，它以物理方式封装了安全功能，通常具有自己的处理器核心、各种内存（RAM、ROM、闪存等）和硬件密码加速器。用于提供加密和解密等安全功能，可以用于存储密钥和证书，并确保他们不会被恶意程序或攻击者访问。 HSM通常由硬件和软件两部分组成：  硬件部分：负责安全处理和密钥存储  软件部分：提供HSM的接口和安全服务   HSM在车联网中的应用在车联网中，HSM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="硬件安全模块HSM初探">
+<meta property="og:url" content="https://xvgeng.github.io/2024/10/27/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/index.html">
+<meta property="og:site_name" content="庚子的博客">
+<meta property="og:description" content="HSM简介HSM是一个专用的硬件安全处理器，它以物理方式封装了安全功能，通常具有自己的处理器核心、各种内存（RAM、ROM、闪存等）和硬件密码加速器。用于提供加密和解密等安全功能，可以用于存储密钥和证书，并确保他们不会被恶意程序或攻击者访问。 HSM通常由硬件和软件两部分组成：  硬件部分：负责安全处理和密钥存储  软件部分：提供HSM的接口和安全服务   HSM在车联网中的应用在车联网中，HSM">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-10-27T12:40:21.000Z">
+<meta property="article:modified_time" content="2024-11-12T15:44:57.965Z">
+<meta property="article:author" content="庚子">
+<meta property="article:tag" content="车联网安全">
+<meta property="article:tag" content="安全启动">
+<meta property="article:tag" content="硬件安全模块">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://xvgeng.github.io/2024/10/27/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://xvgeng.github.io/2024/10/27/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/","path":"2024/10/27/硬件安全模块HSM初探/","title":"硬件安全模块HSM初探"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>硬件安全模块HSM初探 | 庚子的博客</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">庚子的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HSM%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">HSM简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HSM%E5%9C%A8%E8%BD%A6%E8%81%94%E7%BD%91%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">1.1.</span> <span class="nav-text">HSM在车联网中的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E8%BD%A6%E8%BE%86%E5%AE%89%E5%85%A8%E9%80%9A%E4%BF%A1"><span class="nav-number">1.1.1.</span> <span class="nav-text">1. 车辆安全通信</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%BD%A6%E8%BE%86%E8%BF%9C%E7%A8%8B%E6%8E%A7%E5%88%B6"><span class="nav-number">1.1.2.</span> <span class="nav-text">2. 车辆远程控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%BD%A6%E8%BE%86%E6%95%B0%E6%8D%AE%E5%AE%89%E5%85%A8"><span class="nav-number">1.1.3.</span> <span class="nav-text">3. 车辆数据安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E8%BD%A6%E8%BE%86%E9%98%B2%E7%9B%97%E4%BF%9D%E6%8A%A4"><span class="nav-number">1.1.4.</span> <span class="nav-text">4. 车辆防盗保护</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HSM%E5%9C%A8%E8%BD%A6%E8%BE%86%E4%B8%AD%E7%9A%84%E7%89%A9%E7%90%86%E4%BD%8D%E7%BD%AE"><span class="nav-number">1.2.</span> <span class="nav-text">HSM在车辆中的物理位置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%B8%BB%E6%8E%A7%E5%88%B6%E5%8D%95%E5%85%83%EF%BC%88ECU%EF%BC%89"><span class="nav-number">1.2.1.</span> <span class="nav-text">1. 主控制单元（ECU）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%BD%A6%E8%BD%BD%E9%80%9A%E4%BF%A1%E7%BD%91%E5%85%B3%E6%A8%A1%E5%9D%97"><span class="nav-number">1.2.2.</span> <span class="nav-text">2. 车载通信网关模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%BF%A1%E6%81%AF%E5%A8%B1%E4%B9%90%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.2.3.</span> <span class="nav-text">3. 信息娱乐系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E7%94%B5%E6%B1%A0%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%EF%BC%88BMS%EF%BC%89"><span class="nav-number">1.2.4.</span> <span class="nav-text">4. 电池管理系统（BMS）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">2.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="庚子"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">庚子</p>
+  <div class="site-description" itemprop="description">说到做到，不放空炮！</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="https://jiangcara.github.io/" title="https:&#x2F;&#x2F;jiangcara.github.io&#x2F;" rel="noopener" target="_blank">友链传送门</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://xvgeng.github.io/2024/10/27/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="庚子">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="庚子的博客">
+      <meta itemprop="description" content="说到做到，不放空炮！">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="硬件安全模块HSM初探 | 庚子的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          硬件安全模块HSM初探
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-10-27 20:40:21" itemprop="dateCreated datePublished" datetime="2024-10-27T20:40:21+08:00">2024-10-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-12 23:44:57" itemprop="dateModified" datetime="2024-11-12T23:44:57+08:00">2024-11-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">车联网安全</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="HSM简介"><a href="#HSM简介" class="headerlink" title="HSM简介"></a>HSM简介</h1><p>HSM是一个专用的硬件安全处理器，它以物理方式封装了安全功能，通常具有自己的处理器核心、各种内存（RAM、ROM、闪存等）和硬件密码加速器。用于提供加密和解密等安全功能，可以用于存储密钥和证书，并确保他们不会被恶意程序或攻击者访问。</p>
+<p>HSM通常由硬件和软件两部分组成：</p>
+<ul>
+<li><p>硬件部分：负责安全处理和密钥存储</p>
+</li>
+<li><p>软件部分：提供HSM的接口和安全服务</p>
+</li>
+</ul>
+<h2 id="HSM在车联网中的应用"><a href="#HSM在车联网中的应用" class="headerlink" title="HSM在车联网中的应用"></a>HSM在车联网中的应用</h2><p>在车联网中，HSM模块用作专用加密设备，用于保护敏感信息、促进安全通信并确保联网的车辆内关键操作的完整性，例如保护车辆间通信、保护固件更新以及确保可信软件执行。</p>
+<p>为了满足车辆应用的特定标准，HSM提供与ECU应用程序之间的接口以及用于调试的接口。</p>
+<p>目前已经有几家大型芯片制造商提供了具有车载规格架构的安全硬件模块，包括Infineon、ST Microelectronics、Renesas和NXP。从根本上说，HSM通过其自己的处理器核心来执行汽车应用场景所需的所有IT安全功能。</p>
+<h3 id="1-车辆安全通信"><a href="#1-车辆安全通信" class="headerlink" title="1. 车辆安全通信"></a>1. 车辆安全通信</h3><p>HSM支持安全通信协议，比如TLS（传输层安全协议），用于加密车辆与其他设备之间的通信，以防窃听和数据篡改，可实现车辆内电子控制单元（ECU）之间的安全通信通道；提供数字证书和密钥保护，确保车辆通信的安全性和可靠性。</p>
+<h3 id="2-车辆远程控制"><a href="#2-车辆远程控制" class="headerlink" title="2. 车辆远程控制"></a>2. 车辆远程控制</h3><p>HSM确保只有经过身份验证的用户才能访问远程启动、关闭车门、车窗等远程控制功能，以防车辆被未经授权的用户控制；HSM还可以提供安全的OTA（空中升级）机制，用于升级车辆系统的软件和固件，在固件更新时，HSM对固件进行身份验证，验证其完整性。</p>
+<blockquote>
+<p>OTA：是一种通过无线通信技术实现远程更新设备固件或软件的方法</p>
+</blockquote>
+<h3 id="3-车辆数据安全"><a href="#3-车辆数据安全" class="headerlink" title="3. 车辆数据安全"></a>3. 车辆数据安全</h3><p>车辆系统产生大量数据：车辆位置、驾驶行为等，HSM可以用于加密和保护车辆数据，确保数据的机密性和完整性。</p>
+<h3 id="4-车辆防盗保护"><a href="#4-车辆防盗保护" class="headerlink" title="4. 车辆防盗保护"></a>4. 车辆防盗保护</h3><p>HSM提供密钥管理功能：HSM提供数字签名和加密技术，用于保护车辆系统的代码和数据，防止恶意攻击和软件篡改；HSM还提供防盗保护功能，如车辆启动时，需要输入密码或者指纹识别。</p>
+<h2 id="HSM在车辆中的物理位置"><a href="#HSM在车辆中的物理位置" class="headerlink" title="HSM在车辆中的物理位置"></a>HSM在车辆中的物理位置</h2><p>为了更深刻的理解HSM是一个硬件模块这个概念，我查找了一下HSM在车辆中常见位置：</p>
+<h3 id="1-主控制单元（ECU）"><a href="#1-主控制单元（ECU）" class="headerlink" title="1. 主控制单元（ECU）"></a>1. 主控制单元（ECU）</h3><p>HSM常安装在车辆的中央控制系统或者动力总控制单元内部，这些主控制单元用于处理车辆的关键安全和通信任务。</p>
+<h3 id="2-车载通信网关模块"><a href="#2-车载通信网关模块" class="headerlink" title="2. 车载通信网关模块"></a>2. 车载通信网关模块</h3><p>当HSM被集成在车载通信网关模块中时，HSM负责管理里各个ECU之间的数据通信和安全保护，并在此提供安全加密、身份验证和数据保护。</p>
+<h3 id="3-信息娱乐系统"><a href="#3-信息娱乐系统" class="headerlink" title="3. 信息娱乐系统"></a>3. 信息娱乐系统</h3><p>当HSM被集成在信息娱乐系统中时，用于保护车辆的通信和娱乐数据安全，防止黑客攻击或数据泄露。</p>
+<h3 id="4-电池管理系统（BMS）"><a href="#4-电池管理系统（BMS）" class="headerlink" title="4. 电池管理系统（BMS）"></a>4. 电池管理系统（BMS）</h3><p>HSM模块在此确保电池的安全监控和数据的加密传输。</p>
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a target="_blank" rel="noopener" href="https://www.sohu.com/a/747139097_121875536">汽车电子领域的保卫者——HSM浅述_搜狐汽车_搜狐网</a><a target="_blank" rel="noopener" href="https://www.sohu.com/a/747139097_121875536">汽车电子领域的保卫者——HSM浅述_搜狐汽车_搜狐网</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/web/363743.html">https://www.freebuf.com/articles/web/363743.html</a> </p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/DulhqA1o0nnkYTQFjasWjg">https://mp.weixin.qq.com/s/DulhqA1o0nnkYTQFjasWjg</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/dianqicyuyan/article/details/138132331https://blog.csdn.net/dianqicyuyan/article/details/138132331">https://blog.csdn.net/dianqicyuyan/article/details/138132331https://blog.csdn.net/dianqicyuyan/article/details/138132331</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.eet-china.com/mp/a213412.html">https://www.eet-china.com/mp/a213412.html</a> &#x2F;&#x2F;HSM攻击实例</p>
+<p><a target="_blank" rel="noopener" href="https://www.i-newcar.com/index.php?m=home&c=View&a=index&aid=2010">https://www.i-newcar.com/index.php?m=home&amp;c=View&amp;a=index&amp;aid=2010</a> &#x2F;&#x2F;HSM、HSE、SHE区别</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8/" rel="tag"><i class="fa fa-tag"></i> 车联网安全</a>
+              <a href="/tags/%E5%AE%89%E5%85%A8%E5%90%AF%E5%8A%A8/" rel="tag"><i class="fa fa-tag"></i> 安全启动</a>
+              <a href="/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97/" rel="tag"><i class="fa fa-tag"></i> 硬件安全模块</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/09/03/%E5%9F%BA%E4%BA%8EPeach%E7%9A%84Modbus%E5%8D%8F%E8%AE%AE%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/" rel="prev" title="基于Peach的Modbus协议模糊测试">
+                  <i class="fa fa-angle-left"></i> 基于Peach的Modbus协议模糊测试
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/11/12/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%80%EF%BC%89%E6%B1%BD%E8%BD%A6%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97/" rel="next" title="汽车硬件安全模块">
+                  汽车硬件安全模块 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">庚子</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -21,13 +21,13 @@
 
     <meta name="description" content="HSM简介HSM是一个专用的硬件安全处理器，它以物理方式封装了安全功能，通常具有自己的处理器核心、各种内存（RAM、ROM、闪存等）和硬件密码加速器。用于提供加密和解密等安全功能，可以用于存储密钥和证书，并确保他们不会被恶意程序或攻击者访问。 HSM通常由硬件和软件两部分组成：  硬件部分：负责安全处理和密钥存储  软件部分：提供HSM的接口和安全服务   HSM在车联网中的应用在车联网中，HSM">
 <meta property="og:type" content="article">
-<meta property="og:title" content="硬件安全模块HSM初探">
-<meta property="og:url" content="https://xvgeng.github.io/2024/10/27/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/index.html">
+<meta property="og:title" content="车联网安全基础（二）硬件安全模块HSM初探">
+<meta property="og:url" content="https://xvgeng.github.io/2024/10/27/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%BA%8C%EF%BC%89%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/index.html">
 <meta property="og:site_name" content="庚子的博客">
 <meta property="og:description" content="HSM简介HSM是一个专用的硬件安全处理器，它以物理方式封装了安全功能，通常具有自己的处理器核心、各种内存（RAM、ROM、闪存等）和硬件密码加速器。用于提供加密和解密等安全功能，可以用于存储密钥和证书，并确保他们不会被恶意程序或攻击者访问。 HSM通常由硬件和软件两部分组成：  硬件部分：负责安全处理和密钥存储  软件部分：提供HSM的接口和安全服务   HSM在车联网中的应用在车联网中，HSM">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-10-27T12:40:21.000Z">
-<meta property="article:modified_time" content="2024-11-12T15:44:57.965Z">
+<meta property="article:modified_time" content="2024-11-28T15:47:54.319Z">
 <meta property="article:author" content="庚子">
 <meta property="article:tag" content="车联网安全">
 <meta property="article:tag" content="安全启动">
@@ -35,14 +35,14 @@
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://xvgeng.github.io/2024/10/27/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/">
+<link rel="canonical" href="https://xvgeng.github.io/2024/10/27/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%BA%8C%EF%BC%89%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://xvgeng.github.io/2024/10/27/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/","path":"2024/10/27/硬件安全模块HSM初探/","title":"硬件安全模块HSM初探"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://xvgeng.github.io/2024/10/27/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%BA%8C%EF%BC%89%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/","path":"2024/10/27/车联网安全基础（二）硬件安全模块HSM初探/","title":"车联网安全基础（二）硬件安全模块HSM初探"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>硬件安全模块HSM初探 | 庚子的博客</title>
+<title>车联网安全基础（二）硬件安全模块HSM初探 | 庚子的博客</title>
   
 
 
@@ -114,7 +114,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HSM%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">HSM简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HSM%E5%9C%A8%E8%BD%A6%E8%81%94%E7%BD%91%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">1.1.</span> <span class="nav-text">HSM在车联网中的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E8%BD%A6%E8%BE%86%E5%AE%89%E5%85%A8%E9%80%9A%E4%BF%A1"><span class="nav-number">1.1.1.</span> <span class="nav-text">1. 车辆安全通信</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%BD%A6%E8%BE%86%E8%BF%9C%E7%A8%8B%E6%8E%A7%E5%88%B6"><span class="nav-number">1.1.2.</span> <span class="nav-text">2. 车辆远程控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%BD%A6%E8%BE%86%E6%95%B0%E6%8D%AE%E5%AE%89%E5%85%A8"><span class="nav-number">1.1.3.</span> <span class="nav-text">3. 车辆数据安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E8%BD%A6%E8%BE%86%E9%98%B2%E7%9B%97%E4%BF%9D%E6%8A%A4"><span class="nav-number">1.1.4.</span> <span class="nav-text">4. 车辆防盗保护</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HSM%E5%9C%A8%E8%BD%A6%E8%BE%86%E4%B8%AD%E7%9A%84%E7%89%A9%E7%90%86%E4%BD%8D%E7%BD%AE"><span class="nav-number">1.2.</span> <span class="nav-text">HSM在车辆中的物理位置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%B8%BB%E6%8E%A7%E5%88%B6%E5%8D%95%E5%85%83%EF%BC%88ECU%EF%BC%89"><span class="nav-number">1.2.1.</span> <span class="nav-text">1. 主控制单元（ECU）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%BD%A6%E8%BD%BD%E9%80%9A%E4%BF%A1%E7%BD%91%E5%85%B3%E6%A8%A1%E5%9D%97"><span class="nav-number">1.2.2.</span> <span class="nav-text">2. 车载通信网关模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%BF%A1%E6%81%AF%E5%A8%B1%E4%B9%90%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.2.3.</span> <span class="nav-text">3. 信息娱乐系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E7%94%B5%E6%B1%A0%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%EF%BC%88BMS%EF%BC%89"><span class="nav-number">1.2.4.</span> <span class="nav-text">4. 电池管理系统（BMS）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">2.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HSM%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">HSM简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HSM%E5%9C%A8%E8%BD%A6%E8%81%94%E7%BD%91%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">1.1.</span> <span class="nav-text">HSM在车联网中的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E8%BD%A6%E8%BE%86%E5%AE%89%E5%85%A8%E9%80%9A%E4%BF%A1"><span class="nav-number">1.1.1.</span> <span class="nav-text">1. 车辆安全通信</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%BD%A6%E8%BE%86%E8%BF%9C%E7%A8%8B%E6%8E%A7%E5%88%B6"><span class="nav-number">1.1.2.</span> <span class="nav-text">2. 车辆远程控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%BD%A6%E8%BE%86%E6%95%B0%E6%8D%AE%E5%AE%89%E5%85%A8"><span class="nav-number">1.1.3.</span> <span class="nav-text">3. 车辆数据安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E8%BD%A6%E8%BE%86%E9%98%B2%E7%9B%97%E4%BF%9D%E6%8A%A4"><span class="nav-number">1.1.4.</span> <span class="nav-text">4. 车辆防盗保护</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HSM%E5%9C%A8%E5%9B%BA%E4%BB%B6%E7%AD%BE%E5%90%8D%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">1.2.</span> <span class="nav-text">HSM在固件签名中的应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HSM%E5%9C%A8%E8%BD%A6%E8%BE%86%E4%B8%AD%E7%9A%84%E7%89%A9%E7%90%86%E4%BD%8D%E7%BD%AE"><span class="nav-number">1.3.</span> <span class="nav-text">HSM在车辆中的物理位置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%B8%BB%E6%8E%A7%E5%88%B6%E5%8D%95%E5%85%83%EF%BC%88ECU%EF%BC%89"><span class="nav-number">1.3.1.</span> <span class="nav-text">1. 主控制单元（ECU）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%BD%A6%E8%BD%BD%E9%80%9A%E4%BF%A1%E7%BD%91%E5%85%B3%E6%A8%A1%E5%9D%97"><span class="nav-number">1.3.2.</span> <span class="nav-text">2. 车载通信网关模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%BF%A1%E6%81%AF%E5%A8%B1%E4%B9%90%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.3.3.</span> <span class="nav-text">3. 信息娱乐系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E7%94%B5%E6%B1%A0%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%EF%BC%88BMS%EF%BC%89"><span class="nav-number">1.3.4.</span> <span class="nav-text">4. 电池管理系统（BMS）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">2.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -129,7 +129,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -182,7 +182,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://xvgeng.github.io/2024/10/27/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/">
+    <link itemprop="mainEntityOfPage" href="https://xvgeng.github.io/2024/10/27/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%BA%8C%EF%BC%89%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -195,12 +195,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="硬件安全模块HSM初探 | 庚子的博客">
+      <meta itemprop="name" content="车联网安全基础（二）硬件安全模块HSM初探 | 庚子的博客">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          硬件安全模块HSM初探
+          车联网安全基础（二）硬件安全模块HSM初探
         </h1>
 
         <div class="post-meta-container">
@@ -218,7 +218,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-11-12 23:44:57" itemprop="dateModified" datetime="2024-11-12T23:44:57+08:00">2024-11-12</time>
+      <time title="修改时间：2024-11-28 23:47:54" itemprop="dateModified" datetime="2024-11-28T23:47:54+08:00">2024-11-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -257,6 +257,18 @@
 </blockquote>
 <h3 id="3-车辆数据安全"><a href="#3-车辆数据安全" class="headerlink" title="3. 车辆数据安全"></a>3. 车辆数据安全</h3><p>车辆系统产生大量数据：车辆位置、驾驶行为等，HSM可以用于加密和保护车辆数据，确保数据的机密性和完整性。</p>
 <h3 id="4-车辆防盗保护"><a href="#4-车辆防盗保护" class="headerlink" title="4. 车辆防盗保护"></a>4. 车辆防盗保护</h3><p>HSM提供密钥管理功能：HSM提供数字签名和加密技术，用于保护车辆系统的代码和数据，防止恶意攻击和软件篡改；HSM还提供防盗保护功能，如车辆启动时，需要输入密码或者指纹识别。</p>
+<h2 id="HSM在固件签名中的应用"><a href="#HSM在固件签名中的应用" class="headerlink" title="HSM在固件签名中的应用"></a>HSM在固件签名中的应用</h2><ol>
+<li><p>私钥保护：HSM保护签名私钥，确保签名过程的安全性；</p>
+</li>
+<li><p>签名生成：通过HSM生成数字签名，确保签名的安全性和可靠性；</p>
+</li>
+<li><p>密钥管理：管理密钥的生命周期，包括生成、存储和销毁；</p>
+</li>
+</ol>
+<p>固件签名常用工具:</p>
+<ol>
+<li>makecert   2. pvk2pfx    3. SignTool</li>
+</ol>
 <h2 id="HSM在车辆中的物理位置"><a href="#HSM在车辆中的物理位置" class="headerlink" title="HSM在车辆中的物理位置"></a>HSM在车辆中的物理位置</h2><p>为了更深刻的理解HSM是一个硬件模块这个概念，我查找了一下HSM在车辆中常见位置：</p>
 <h3 id="1-主控制单元（ECU）"><a href="#1-主控制单元（ECU）" class="headerlink" title="1. 主控制单元（ECU）"></a>1. 主控制单元（ECU）</h3><p>HSM常安装在车辆的中央控制系统或者动力总控制单元内部，这些主控制单元用于处理车辆的关键安全和通信任务。</p>
 <h3 id="2-车载通信网关模块"><a href="#2-车载通信网关模块" class="headerlink" title="2. 车载通信网关模块"></a>2. 车载通信网关模块</h3><p>当HSM被集成在车载通信网关模块中时，HSM负责管理里各个ECU之间的数据通信和安全保护，并在此提供安全加密、身份验证和数据保护。</p>
@@ -291,8 +303,8 @@
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2024/11/12/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%80%EF%BC%89%E6%B1%BD%E8%BD%A6%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97/" rel="next" title="汽车硬件安全模块">
-                  汽车硬件安全模块 <i class="fa fa-angle-right"></i>
+                <a href="/2024/11/12/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%80%EF%BC%89%E6%B1%BD%E8%BD%A6%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97/" rel="next" title="车联网安全基础（一） 汽车硬件安全模块">
+                  车联网安全基础（一） 汽车硬件安全模块 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
           </div>

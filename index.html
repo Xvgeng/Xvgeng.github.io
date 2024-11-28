@@ -123,7 +123,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -175,6 +175,160 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://xvgeng.github.io/2024/11/25/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%89%EF%BC%89Secure%20Boot/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="庚子">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="庚子的博客">
+      <meta itemprop="description" content="说到做到，不放空炮！">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 庚子的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/11/25/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%89%EF%BC%89Secure%20Boot/" class="post-title-link" itemprop="url">车联网安全基础（三）Secure Boot</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-11-25 14:50:35" itemprop="dateCreated datePublished" datetime="2024-11-25T14:50:35+08:00">2024-11-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-28 23:48:46" itemprop="dateModified" datetime="2024-11-28T23:48:46+08:00">2024-11-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">车联网安全</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="1-背景"><a href="#1-背景" class="headerlink" title="1. 背景"></a>1. 背景</h1><h2 id="1-1-Secure-Boot介绍"><a href="#1-1-Secure-Boot介绍" class="headerlink" title="1.1 Secure Boot介绍"></a>1.1 Secure Boot介绍</h2><p>在PC中，安全启动（Secure boot）是一种行业标准，旨在帮助设备仅使用原始制造商（OEM）信任的软件进行启动，当系统启动时，固件会检查每个启动软件的签名，防止非法软件的运行。</p>
+<p>在车载信息安全中，安全启动是指在整车各个ECU的启动阶段做好安全确认和校验，以预防针对车载芯片的两种攻击。</p>
+<ul>
+<li><p>代码被恶意更改或攻击</p>
+</li>
+<li><p>代码IP被非法读取或获取</p>
+</li>
+</ul>
+<h2 id="1-2-应用背景"><a href="#1-2-应用背景" class="headerlink" title="1.2 应用背景"></a>1.2 应用背景</h2><p>随着智能驾驶、智能座驾的发展，车辆内部ECU之间不仅可以通过总线技术通信，还可以通过V2X技术与车外设备通信。为了保证ECU中程序的安全，安全启动技术开始兴起。</p>
+<p>目前多使用硬件安全模块（如HSM、HSE）来简化对芯片上代码加密和启动代码验证的工作，具备安全启动技术的HSM芯片，会利用芯片上OTP区域内存储的用户密钥信息对即将加载的软件进行多级安全验证，从而建立起可靠的安全信任链。</p>
+<p>OTP区域是芯片上的一块区域，一般用于存储用户密钥信息，其原理与保险丝一致。芯片在出场后，OTP区域所有bit为1，当某个bit位被烧写为0时，就会彻底熔断该bit位，使其数值无法改变。也有一些芯片通过控制寄存器来控制bit位的值，其核心思想就是使某个内存区域的值无法改变。</p>
+<h1 id="2-Secure-Boot实现"><a href="#2-Secure-Boot实现" class="headerlink" title="2. Secure Boot实现"></a>2. Secure Boot实现</h1><p>Secure Boot要实现的目标有两个：</p>
+<ul>
+<li><p>保护软件版本IP，防止代码被篡改</p>
+</li>
+<li><p>解决信任问题，保证CPU加载的软件版本是由指定软件发布者发布的软件版本，而不是非法版本</p>
+</li>
+</ul>
+<p>通过对代码明文加密可以实现防止代码被篡改，而使用基于非对称加密的数字签名技术可以实现认证效果。</p>
+<p>由于我对数字签名技术不太熟悉，这里着重学习一下数字签名的原理。</p>
+<p>在安全启动过程中软件版本发布者可以使用RSA私钥来加密代码的信息摘要，生成数字签名，芯片则可使用对应的RSA公钥来对数字签名进行解密，从而验证版本的真实性。同时一旦验证，也具备不可抵赖性，因为只有软件版本的发布者才有私钥。</p>
+<h2 id="2-1-相关密码学知识"><a href="#2-1-相关密码学知识" class="headerlink" title="2.1 相关密码学知识"></a>2.1 相关密码学知识</h2><h3 id="2-1-1-对称加密算法AES"><a href="#2-1-1-对称加密算法AES" class="headerlink" title="2.1.1 对称加密算法AES"></a>2.1.1 对称加密算法AES</h3><p>AES作为一种对称加密算法，在加密和解密时使用同一个密钥，所以可以使用AES算法对代码明文加密，实现保护软件版本IP，防止代码被恶意篡改的目的。</p>
+<p>在安全启动技术中，可以将代码明文用AES算法加密，然后将密文烧录到芯片的存储区，并将密钥烧录到芯片的OTP区。当HSM等安全硬件模块启动时，会将加密后的代码加载到内存中，并从OTP区读取AES密钥，将代码密文解密为明文。</p>
+<h3 id="2-1-2-哈希算法"><a href="#2-1-2-哈希算法" class="headerlink" title="2.1.2 哈希算法"></a>2.1.2 哈希算法</h3><p>哈希算法可以将任意一组数据变换为一组定长的数字指纹，该数字指纹也成为信息摘要，哈希算法具备两个特征：</p>
+<ul>
+<li><p>加密过程不可逆：意味着无法从信息摘要逆向推算出加密前的明文内容</p>
+</li>
+<li><p>一一对应性：明文与信息摘要一一对应</p>
+</li>
+</ul>
+<p>在安全启动技术中，可以通过验证代码的信息摘要，来校验代码的完整性；也可以结合非对称加密算法，生成数字指纹，来实现认证工作。</p>
+<h3 id="2-1-3-非对称加密算法RSA"><a href="#2-1-3-非对称加密算法RSA" class="headerlink" title="2.1.3 非对称加密算法RSA"></a>2.1.3 非对称加密算法RSA</h3><p>非对称加密算法拥有一对对应的公钥和私钥，可以使用私钥加密数据，再使用公钥解密数据。该技术可以应用在验证机制中。</p>
+<h3 id="2-1-4-数字证书"><a href="#2-1-4-数字证书" class="headerlink" title="2.1.4 数字证书"></a>2.1.4 数字证书</h3><p>数字证书是一种权威性的文档，由证书签发机关（CA）签发的对用户公钥的认证，也称为“根证书”。数字证书的格式和验证方法需要遵循X.509国际标准，并包含以下内容：</p>
+<ul>
+<li><p>电子签证机关的信息</p>
+</li>
+<li><p>公钥用户信息</p>
+</li>
+<li><p>公钥</p>
+</li>
+<li><p>有效期和数字签名等</p>
+</li>
+</ul>
+<h2 id="2-2-实现策略"><a href="#2-2-实现策略" class="headerlink" title="2.2 实现策略"></a>2.2 实现策略</h2><h3 id="2-2-1-安全镜像文件生成"><a href="#2-2-1-安全镜像文件生成" class="headerlink" title="2.2.1 安全镜像文件生成"></a>2.2.1 安全镜像文件生成</h3><ol>
+<li><p>用户使用AES加密算法将代码明文转换为密文，并将AES密钥存储在OTP区</p>
+</li>
+<li><p>用户使用SHA256算法对代码密文进行哈希运算，得到该软件版本密文的信息摘要</p>
+</li>
+<li><p>用户生成包含密文信息摘要和RSA公钥信息的<mark>数字证书</mark></p>
+</li>
+<li><p>用户使用SHA256算法对数字证书做哈希运算，得到数字证书的信息摘要，同时使用RSA私钥对数字证书的信息摘要加密，最终得到该用户的<mark>数字签名</mark></p>
+</li>
+</ol>
+<h3 id="2-2-2-安全镜像文件验证"><a href="#2-2-2-安全镜像文件验证" class="headerlink" title="2.2.2 安全镜像文件验证"></a>2.2.2 安全镜像文件验证</h3><ol>
+<li><p>芯片复位启动后，通过硬件加密模块如HSM或者HSE先对烧录在Flash中的X.509标准数字证书公钥信息进行哈希运算，并与提前烧录到芯片OTP区域的公钥哈希值进行比对，如果结果一致，那么则可以确认公钥的合法性，这个就是整个信息安全信任链的第一个环节，也是十分重要的环节</p>
+</li>
+<li><p>公钥合法性确认后，硬件加密模块如HSM或HSE再利用数字证书的数字签名进行用户合法性鉴权。具体操作步骤就是通过上述确认的公钥对数字签名进行解密处理得到证书的哈希值，同时针对存储在Flash芯片上的证书重新进行哈希运算，对比两个哈希值是否一致，如果一致，则鉴权成功，合法性得到了保障</p>
+</li>
+<li><p>然后再利用硬件加密模块如HSM或HSE来重新计算Flash芯片上存储的软件版本的哈希值，即信息摘要，并与数字证书的信息摘要进行比对确认是否一致，如果匹配则说明代码没有被恶意篡改， 用户软件版本的完整性与安全性得到了保障</p>
+</li>
+<li><p>芯片硬件加密模块如HSM或HSE最终利用OTP区域提前存储的AES对代码进行解密处理，从而得到代码明文，最终便可以正常加载到CPU中启动运行</p>
+</li>
+</ol>
+<p>如果上述任意一个流程没有通过，将不会进行后续流程的校验，系统将停驻在boot中。</p>
+<h1 id="3-参考链接"><a href="#3-参考链接" class="headerlink" title="3. 参考链接"></a>3. 参考链接</h1><ol>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/wto9109/article/details/134724173">车载信息安全之Secure Boot实现策略</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/MWIJlZqEAeo2jkLnDTAfoQ">一文搞懂Secure Boot</a></p>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="https://xvgeng.github.io/2024/11/12/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%80%EF%BC%89%E6%B1%BD%E8%BD%A6%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -193,7 +347,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/11/12/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%80%EF%BC%89%E6%B1%BD%E8%BD%A6%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97/" class="post-title-link" itemprop="url">汽车硬件安全模块</a>
+          <a href="/2024/11/12/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%80%EF%BC%89%E6%B1%BD%E8%BD%A6%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97/" class="post-title-link" itemprop="url">车联网安全基础（一） 汽车硬件安全模块</a>
         </h2>
 
         <div class="post-meta-container">
@@ -203,9 +357,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2024-11-12 23:10:43 / 修改时间：23:53:50" itemprop="dateCreated datePublished" datetime="2024-11-12T23:10:43+08:00">2024-11-12</time>
+      <time title="创建时间：2024-11-12 23:10:43" itemprop="dateCreated datePublished" datetime="2024-11-12T23:10:43+08:00">2024-11-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-28 23:50:34" itemprop="dateModified" datetime="2024-11-28T23:50:34+08:00">2024-11-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -264,7 +424,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://xvgeng.github.io/2024/10/27/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/">
+    <link itemprop="mainEntityOfPage" href="https://xvgeng.github.io/2024/10/27/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%BA%8C%EF%BC%89%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -282,7 +442,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/10/27/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/" class="post-title-link" itemprop="url">硬件安全模块HSM初探</a>
+          <a href="/2024/10/27/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%BA%8C%EF%BC%89%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97HSM%E5%88%9D%E6%8E%A2/" class="post-title-link" itemprop="url">车联网安全基础（二）硬件安全模块HSM初探</a>
         </h2>
 
         <div class="post-meta-container">
@@ -300,7 +460,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-11-12 23:44:57" itemprop="dateModified" datetime="2024-11-12T23:44:57+08:00">2024-11-12</time>
+      <time title="修改时间：2024-11-28 23:47:54" itemprop="dateModified" datetime="2024-11-28T23:47:54+08:00">2024-11-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -340,6 +500,18 @@
 </blockquote>
 <h3 id="3-车辆数据安全"><a href="#3-车辆数据安全" class="headerlink" title="3. 车辆数据安全"></a>3. 车辆数据安全</h3><p>车辆系统产生大量数据：车辆位置、驾驶行为等，HSM可以用于加密和保护车辆数据，确保数据的机密性和完整性。</p>
 <h3 id="4-车辆防盗保护"><a href="#4-车辆防盗保护" class="headerlink" title="4. 车辆防盗保护"></a>4. 车辆防盗保护</h3><p>HSM提供密钥管理功能：HSM提供数字签名和加密技术，用于保护车辆系统的代码和数据，防止恶意攻击和软件篡改；HSM还提供防盗保护功能，如车辆启动时，需要输入密码或者指纹识别。</p>
+<h2 id="HSM在固件签名中的应用"><a href="#HSM在固件签名中的应用" class="headerlink" title="HSM在固件签名中的应用"></a>HSM在固件签名中的应用</h2><ol>
+<li><p>私钥保护：HSM保护签名私钥，确保签名过程的安全性；</p>
+</li>
+<li><p>签名生成：通过HSM生成数字签名，确保签名的安全性和可靠性；</p>
+</li>
+<li><p>密钥管理：管理密钥的生命周期，包括生成、存储和销毁；</p>
+</li>
+</ol>
+<p>固件签名常用工具:</p>
+<ol>
+<li>makecert   2. pvk2pfx    3. SignTool</li>
+</ol>
 <h2 id="HSM在车辆中的物理位置"><a href="#HSM在车辆中的物理位置" class="headerlink" title="HSM在车辆中的物理位置"></a>HSM在车辆中的物理位置</h2><p>为了更深刻的理解HSM是一个硬件模块这个概念，我查找了一下HSM在车辆中常见位置：</p>
 <h3 id="1-主控制单元（ECU）"><a href="#1-主控制单元（ECU）" class="headerlink" title="1. 主控制单元（ECU）"></a>1. 主控制单元（ECU）</h3><p>HSM常安装在车辆的中央控制系统或者动力总控制单元内部，这些主控制单元用于处理车辆的关键安全和通信任务。</p>
 <h3 id="2-车载通信网关模块"><a href="#2-车载通信网关模块" class="headerlink" title="2. 车载通信网关模块"></a>2. 车载通信网关模块</h3><p>当HSM被集成在车载通信网关模块中时，HSM负责管理里各个ECU之间的数据通信和安全保护，并在此提供安全加密、身份验证和数据保护。</p>
@@ -846,6 +1018,13 @@
       <span class="post-meta-item-text">发表于</span>
 
       <time title="创建时间：2024-06-09 22:04:10" itemprop="dateCreated datePublished" datetime="2024-06-09T22:04:10+08:00">2024-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-28 23:44:59" itemprop="dateModified" datetime="2024-11-28T23:44:59+08:00">2024-11-28</time>
     </span>
 
   

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.2.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"xvgeng.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="1. 背景1.1 Secure Boot介绍在PC中，安全启动（Secure boot）是一种行业标准，旨在帮助设备仅使用原始制造商（OEM）信任的软件进行启动，当系统启动时，固件会检查每个启动软件的签名，防止非法软件的运行。 在车载信息安全中，安全启动是指在整车各个ECU的启动阶段做好安全确认和校验，以预防针对车载芯片的两种攻击。  代码被恶意更改或攻击  代码IP被非法读取或获取   1.2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="车联网安全基础（三）Secure Boot">
+<meta property="og:url" content="https://xvgeng.github.io/2024/11/25/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%89%EF%BC%89Secure%20Boot/index.html">
+<meta property="og:site_name" content="庚子的博客">
+<meta property="og:description" content="1. 背景1.1 Secure Boot介绍在PC中，安全启动（Secure boot）是一种行业标准，旨在帮助设备仅使用原始制造商（OEM）信任的软件进行启动，当系统启动时，固件会检查每个启动软件的签名，防止非法软件的运行。 在车载信息安全中，安全启动是指在整车各个ECU的启动阶段做好安全确认和校验，以预防针对车载芯片的两种攻击。  代码被恶意更改或攻击  代码IP被非法读取或获取   1.2">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-11-25T06:50:35.000Z">
+<meta property="article:modified_time" content="2024-11-28T15:48:46.413Z">
+<meta property="article:author" content="庚子">
+<meta property="article:tag" content="车联网安全">
+<meta property="article:tag" content="安全启动">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://xvgeng.github.io/2024/11/25/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%89%EF%BC%89Secure%20Boot/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://xvgeng.github.io/2024/11/25/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%89%EF%BC%89Secure%20Boot/","path":"2024/11/25/车联网安全基础（三）Secure Boot/","title":"车联网安全基础（三）Secure Boot"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>车联网安全基础（三）Secure Boot | 庚子的博客</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">庚子的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">1. 背景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-Secure-Boot%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 Secure Boot介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-%E5%BA%94%E7%94%A8%E8%83%8C%E6%99%AF"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 应用背景</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Secure-Boot%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">2. Secure Boot实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%E7%9B%B8%E5%85%B3%E5%AF%86%E7%A0%81%E5%AD%A6%E7%9F%A5%E8%AF%86"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 相关密码学知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-1-%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95AES"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1 对称加密算法AES</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-2-%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.1.2 哈希算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-3-%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95RSA"><span class="nav-number">2.1.3.</span> <span class="nav-text">2.1.3 非对称加密算法RSA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-4-%E6%95%B0%E5%AD%97%E8%AF%81%E4%B9%A6"><span class="nav-number">2.1.4.</span> <span class="nav-text">2.1.4 数字证书</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%E5%AE%9E%E7%8E%B0%E7%AD%96%E7%95%A5"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 实现策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-1-%E5%AE%89%E5%85%A8%E9%95%9C%E5%83%8F%E6%96%87%E4%BB%B6%E7%94%9F%E6%88%90"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.2.1 安全镜像文件生成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-2-%E5%AE%89%E5%85%A8%E9%95%9C%E5%83%8F%E6%96%87%E4%BB%B6%E9%AA%8C%E8%AF%81"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2.2 安全镜像文件验证</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">3.</span> <span class="nav-text">3. 参考链接</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="庚子"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">庚子</p>
+  <div class="site-description" itemprop="description">说到做到，不放空炮！</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="https://jiangcara.github.io/" title="https:&#x2F;&#x2F;jiangcara.github.io&#x2F;" rel="noopener" target="_blank">友链传送门</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://xvgeng.github.io/2024/11/25/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%89%EF%BC%89Secure%20Boot/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="庚子">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="庚子的博客">
+      <meta itemprop="description" content="说到做到，不放空炮！">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="车联网安全基础（三）Secure Boot | 庚子的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          车联网安全基础（三）Secure Boot
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-11-25 14:50:35" itemprop="dateCreated datePublished" datetime="2024-11-25T14:50:35+08:00">2024-11-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-28 23:48:46" itemprop="dateModified" datetime="2024-11-28T23:48:46+08:00">2024-11-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">车联网安全</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="1-背景"><a href="#1-背景" class="headerlink" title="1. 背景"></a>1. 背景</h1><h2 id="1-1-Secure-Boot介绍"><a href="#1-1-Secure-Boot介绍" class="headerlink" title="1.1 Secure Boot介绍"></a>1.1 Secure Boot介绍</h2><p>在PC中，安全启动（Secure boot）是一种行业标准，旨在帮助设备仅使用原始制造商（OEM）信任的软件进行启动，当系统启动时，固件会检查每个启动软件的签名，防止非法软件的运行。</p>
+<p>在车载信息安全中，安全启动是指在整车各个ECU的启动阶段做好安全确认和校验，以预防针对车载芯片的两种攻击。</p>
+<ul>
+<li><p>代码被恶意更改或攻击</p>
+</li>
+<li><p>代码IP被非法读取或获取</p>
+</li>
+</ul>
+<h2 id="1-2-应用背景"><a href="#1-2-应用背景" class="headerlink" title="1.2 应用背景"></a>1.2 应用背景</h2><p>随着智能驾驶、智能座驾的发展，车辆内部ECU之间不仅可以通过总线技术通信，还可以通过V2X技术与车外设备通信。为了保证ECU中程序的安全，安全启动技术开始兴起。</p>
+<p>目前多使用硬件安全模块（如HSM、HSE）来简化对芯片上代码加密和启动代码验证的工作，具备安全启动技术的HSM芯片，会利用芯片上OTP区域内存储的用户密钥信息对即将加载的软件进行多级安全验证，从而建立起可靠的安全信任链。</p>
+<p>OTP区域是芯片上的一块区域，一般用于存储用户密钥信息，其原理与保险丝一致。芯片在出场后，OTP区域所有bit为1，当某个bit位被烧写为0时，就会彻底熔断该bit位，使其数值无法改变。也有一些芯片通过控制寄存器来控制bit位的值，其核心思想就是使某个内存区域的值无法改变。</p>
+<h1 id="2-Secure-Boot实现"><a href="#2-Secure-Boot实现" class="headerlink" title="2. Secure Boot实现"></a>2. Secure Boot实现</h1><p>Secure Boot要实现的目标有两个：</p>
+<ul>
+<li><p>保护软件版本IP，防止代码被篡改</p>
+</li>
+<li><p>解决信任问题，保证CPU加载的软件版本是由指定软件发布者发布的软件版本，而不是非法版本</p>
+</li>
+</ul>
+<p>通过对代码明文加密可以实现防止代码被篡改，而使用基于非对称加密的数字签名技术可以实现认证效果。</p>
+<p>由于我对数字签名技术不太熟悉，这里着重学习一下数字签名的原理。</p>
+<p>在安全启动过程中软件版本发布者可以使用RSA私钥来加密代码的信息摘要，生成数字签名，芯片则可使用对应的RSA公钥来对数字签名进行解密，从而验证版本的真实性。同时一旦验证，也具备不可抵赖性，因为只有软件版本的发布者才有私钥。</p>
+<h2 id="2-1-相关密码学知识"><a href="#2-1-相关密码学知识" class="headerlink" title="2.1 相关密码学知识"></a>2.1 相关密码学知识</h2><h3 id="2-1-1-对称加密算法AES"><a href="#2-1-1-对称加密算法AES" class="headerlink" title="2.1.1 对称加密算法AES"></a>2.1.1 对称加密算法AES</h3><p>AES作为一种对称加密算法，在加密和解密时使用同一个密钥，所以可以使用AES算法对代码明文加密，实现保护软件版本IP，防止代码被恶意篡改的目的。</p>
+<p>在安全启动技术中，可以将代码明文用AES算法加密，然后将密文烧录到芯片的存储区，并将密钥烧录到芯片的OTP区。当HSM等安全硬件模块启动时，会将加密后的代码加载到内存中，并从OTP区读取AES密钥，将代码密文解密为明文。</p>
+<h3 id="2-1-2-哈希算法"><a href="#2-1-2-哈希算法" class="headerlink" title="2.1.2 哈希算法"></a>2.1.2 哈希算法</h3><p>哈希算法可以将任意一组数据变换为一组定长的数字指纹，该数字指纹也成为信息摘要，哈希算法具备两个特征：</p>
+<ul>
+<li><p>加密过程不可逆：意味着无法从信息摘要逆向推算出加密前的明文内容</p>
+</li>
+<li><p>一一对应性：明文与信息摘要一一对应</p>
+</li>
+</ul>
+<p>在安全启动技术中，可以通过验证代码的信息摘要，来校验代码的完整性；也可以结合非对称加密算法，生成数字指纹，来实现认证工作。</p>
+<h3 id="2-1-3-非对称加密算法RSA"><a href="#2-1-3-非对称加密算法RSA" class="headerlink" title="2.1.3 非对称加密算法RSA"></a>2.1.3 非对称加密算法RSA</h3><p>非对称加密算法拥有一对对应的公钥和私钥，可以使用私钥加密数据，再使用公钥解密数据。该技术可以应用在验证机制中。</p>
+<h3 id="2-1-4-数字证书"><a href="#2-1-4-数字证书" class="headerlink" title="2.1.4 数字证书"></a>2.1.4 数字证书</h3><p>数字证书是一种权威性的文档，由证书签发机关（CA）签发的对用户公钥的认证，也称为“根证书”。数字证书的格式和验证方法需要遵循X.509国际标准，并包含以下内容：</p>
+<ul>
+<li><p>电子签证机关的信息</p>
+</li>
+<li><p>公钥用户信息</p>
+</li>
+<li><p>公钥</p>
+</li>
+<li><p>有效期和数字签名等</p>
+</li>
+</ul>
+<h2 id="2-2-实现策略"><a href="#2-2-实现策略" class="headerlink" title="2.2 实现策略"></a>2.2 实现策略</h2><h3 id="2-2-1-安全镜像文件生成"><a href="#2-2-1-安全镜像文件生成" class="headerlink" title="2.2.1 安全镜像文件生成"></a>2.2.1 安全镜像文件生成</h3><ol>
+<li><p>用户使用AES加密算法将代码明文转换为密文，并将AES密钥存储在OTP区</p>
+</li>
+<li><p>用户使用SHA256算法对代码密文进行哈希运算，得到该软件版本密文的信息摘要</p>
+</li>
+<li><p>用户生成包含密文信息摘要和RSA公钥信息的<mark>数字证书</mark></p>
+</li>
+<li><p>用户使用SHA256算法对数字证书做哈希运算，得到数字证书的信息摘要，同时使用RSA私钥对数字证书的信息摘要加密，最终得到该用户的<mark>数字签名</mark></p>
+</li>
+</ol>
+<h3 id="2-2-2-安全镜像文件验证"><a href="#2-2-2-安全镜像文件验证" class="headerlink" title="2.2.2 安全镜像文件验证"></a>2.2.2 安全镜像文件验证</h3><ol>
+<li><p>芯片复位启动后，通过硬件加密模块如HSM或者HSE先对烧录在Flash中的X.509标准数字证书公钥信息进行哈希运算，并与提前烧录到芯片OTP区域的公钥哈希值进行比对，如果结果一致，那么则可以确认公钥的合法性，这个就是整个信息安全信任链的第一个环节，也是十分重要的环节</p>
+</li>
+<li><p>公钥合法性确认后，硬件加密模块如HSM或HSE再利用数字证书的数字签名进行用户合法性鉴权。具体操作步骤就是通过上述确认的公钥对数字签名进行解密处理得到证书的哈希值，同时针对存储在Flash芯片上的证书重新进行哈希运算，对比两个哈希值是否一致，如果一致，则鉴权成功，合法性得到了保障</p>
+</li>
+<li><p>然后再利用硬件加密模块如HSM或HSE来重新计算Flash芯片上存储的软件版本的哈希值，即信息摘要，并与数字证书的信息摘要进行比对确认是否一致，如果匹配则说明代码没有被恶意篡改， 用户软件版本的完整性与安全性得到了保障</p>
+</li>
+<li><p>芯片硬件加密模块如HSM或HSE最终利用OTP区域提前存储的AES对代码进行解密处理，从而得到代码明文，最终便可以正常加载到CPU中启动运行</p>
+</li>
+</ol>
+<p>如果上述任意一个流程没有通过，将不会进行后续流程的校验，系统将停驻在boot中。</p>
+<h1 id="3-参考链接"><a href="#3-参考链接" class="headerlink" title="3. 参考链接"></a>3. 参考链接</h1><ol>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/wto9109/article/details/134724173">车载信息安全之Secure Boot实现策略</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/MWIJlZqEAeo2jkLnDTAfoQ">一文搞懂Secure Boot</a></p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8/" rel="tag"><i class="fa fa-tag"></i> 车联网安全</a>
+              <a href="/tags/%E5%AE%89%E5%85%A8%E5%90%AF%E5%8A%A8/" rel="tag"><i class="fa fa-tag"></i> 安全启动</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/11/12/%E8%BD%A6%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%80%EF%BC%89%E6%B1%BD%E8%BD%A6%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9D%97/" rel="prev" title="车联网安全基础（一） 汽车硬件安全模块">
+                  <i class="fa fa-angle-left"></i> 车联网安全基础（一） 汽车硬件安全模块
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">庚子</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
